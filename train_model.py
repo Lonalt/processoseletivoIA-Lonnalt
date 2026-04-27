@@ -18,7 +18,6 @@ def config():
         "seed": 7,
     }
 
-
 def preparar_dados():
     """Carrega + preprocessa tudo em um único fluxo."""
     print("[RUN] Inicializando dados...")
@@ -36,7 +35,6 @@ def preparar_dados():
     print(f"[RUN] Shapes -> treino={x_tr.shape}, teste={x_te.shape}")
 
     return (x_tr, y_tr), (x_te, y_te)
-
 
 def arquitetura():
     """Define a rede usando composição incremental."""
@@ -60,7 +58,6 @@ def arquitetura():
     saida = cabeca(x)
 
     return keras.Model(entradas, saida, name="digit_net_alt")
-
 
 def ciclo_treino(modelo, dados, cfg):
     """Executa treino + logging + avaliação parcial."""
@@ -90,7 +87,6 @@ def ciclo_treino(modelo, dados, cfg):
 
     return hist, acc
 
-
 def relatorio(hist):
     """Gera saída mais compacta (estrutura diferente)."""
     h = hist.history
@@ -100,14 +96,12 @@ def relatorio(hist):
     for idx, (l, a, vl, va) in enumerate(linhas, start=1):
         print(f"{idx:02d} :: {l:.3f} | {a:.3f} | {vl:.3f} | {va:.3f}")
 
-
 def persistir(modelo, caminho):
     """Salva modelo com info de tamanho."""
     modelo.save(caminho, include_optimizer=False)
 
     size = os.path.getsize(caminho) / 1024
     print(f"[SAVE] {caminho} ({size:.1f} KB)")
-
 
 def executar():
     cfg = config()
@@ -125,7 +119,6 @@ def executar():
     relatorio(hist)
 
     persistir(modelo, cfg["arquivo"])
-
 
 if __name__ == "__main__":
     executar()

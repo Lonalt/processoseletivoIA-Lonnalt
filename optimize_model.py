@@ -9,7 +9,6 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 
-
 def parametros():
     return {
         "entrada_modelo": "model.h5",
@@ -38,7 +37,6 @@ def carregar_e_converter(cfg):
 
     return modelo
 
-
 def preparar_amostras(qtd):
     """Carrega MNIST e retorna subconjunto pronto."""
     (_, _), (x, y) = keras.datasets.mnist.load_data()
@@ -46,7 +44,6 @@ def preparar_amostras(qtd):
     x = (x.astype(np.float32) / 255.0)[..., None]
 
     return x[:qtd], y[:qtd]
-
 
 def rodar_tflite(caminho, imagens):
     """Executa inferência via interpreter."""
@@ -84,7 +81,6 @@ def comparar(modelo, imagens, rotulos, preds_tflite):
 
         print(f"[CHECK] Keras acc: {acc_keras:.2f}%")
         print(f"[CHECK] Dif: {acc_tflite - acc_keras:+.2f} pp")
-
 
 def estatisticas(antes, depois):
     """Mostra redução de tamanho."""
