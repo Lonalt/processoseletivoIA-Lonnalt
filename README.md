@@ -1,58 +1,62 @@
-# Relatório do Candidato
+# 📊 Dashboard de Performance: Desafio IA
+**Desenvolvedor:** Luann Alves Pereira De Lima  
+**Repositório:** [Lonalt/processoseletivoIA-Lonnalt](https://github.com/Lonalt/processoseletivoIA-Lonnalt)
 
-**Nome completo:** Luann Alves Pereira De Lima  
-**GitHub:** [https://github.com/Lonalt/processoseletivoIA-Lonnalt](https://github.com/Lonalt/processoseletivoIA-Lonnalt)
+---
 
-## 1. Resumo da arquitetura do modelo
+## ⚡ Sumário de Eficiência
+O projeto alcançou um equilíbrio otimizado entre peso computacional e precisão preditiva, ideal para implantação em hardware limitado.
 
-O modelo implementado no pipeline é uma rede neural convolucional (CNN) projetada para o dataset MNIST. A arquitetura foca no equilíbrio entre precisão e eficiência para ambientes de Edge AI.
+| Métrica | Status | Resultado |
+| :--- | :--- | :--- |
+| **Acurácia Final** | 🎯 Excelente | **98,56%** |
+| **Integridade de Conversão** | 💎 Perfeita | **0.00 pp de perda** |
+| **Taxa de Compressão** | 📉 Alta | **-74,8%** |
+| **Complexidade** | ⚙️ Leve | **119.530 parâmetros** |
 
-| Etapa | Camada | Configuração | Função |
-| :--- | :--- | :--- | :--- |
-| Entrada | `Input` | `(28, 28, 1)` | Recebe a imagem normalizada (0 a 1) |
-| 1 | `Conv2D` | 32 filtros, 3x3, ReLU | Extração inicial de características |
-| 2 | `MaxPooling2D` | 2x2 | Redução de dimensionalidade espacial |
-| 3 | `Conv2D` | 64 filtros, 3x3, ReLU | Extração de características de alto nível |
-| 4 | `MaxPooling2D` | 2x2 | Segunda redução espacial |
-| 5 | `Flatten` | - | Vetorização para a parte densa |
-| 6 | `Dense` | 32 unidades, ReLU | Camada de decisão compacta |
-| 7 | `Dropout` | taxa 0.3 | Prevenção de overfitting |
-| Saída | `Dense` | 10 unidades, Softmax | Classificação das 10 classes (0-9) |
+---
 
-O design utiliza `padding="same"` para preservar informações de borda e garantir uma redução controlada do tensor. A escolha de uma camada densa de 32 unidades visa minimizar o número de parâmetros sem comprometer a acurácia final.
+## 🏗️ Engenharia do Modelo (CNN)
+A arquitetura foi construída seguindo uma progressão lógica de extração de padrões, projetada para ser robusta contra ruídos sem inflar o uso de memória.
 
-O treinamento foi configurado com o otimizador **Adam**, função de perda `sparse_categorical_crossentropy` e semente aleatória fixa (`seed=7`) para garantir reprodutibilidade.
+### Fluxo de Dados e Dimensões
+1.  **Recepção**: Tensor de entrada `(28, 28, 1)` normalizado em ponto flutuante.
+2.  **Extração Espacial**: 
+    *   `Conv2D (32)` -> `MaxPooling`: Capta bordas fundamentais.
+    *   `Conv2D (64)` -> `MaxPooling`: Reconhece formas complexas (curvas e loops dos números).
+3.  **Redução Logística**: 
+    *   A camada `Dense` foi limitada a **32 neurônios**. 
+    *   **Decisão Técnica**: Esta escolha cortou drasticamente o número de pesos (apenas 100.384 parâmetros nesta camada) em comparação a uma camada de 64, mantendo a capacidade de generalização necessária para o MNIST.
+4.  **Regularização**: Inclusão de `Dropout(0.3)` para garantir que a rede não memorize os dados de treino.
 
-## 2. Bibliotecas utilizadas
+---
 
-| Biblioteca | Uso no projeto |
-| :--- | :--- |
-| **TensorFlow / Keras** | Construção da CNN, treinamento e conversão TFLite. |
-| **NumPy** | Pré-processamento de matrizes e manipulação de dados numéricos. |
-| **OS** | Gerenciamento de arquivos e medição de tamanho em disco. |
+## 💎 Estratégia de Otimização: DRQ
+Para a entrega de borda, foi aplicada a **Dynamic Range Quantization** no `optimize_model.py`.
 
-## 3. Técnica de otimização do modelo
+*   **Implementação**: Conversão do modelo Keras para o formato FlatBuffer do TFLite utilizando `tf.lite.Optimize.DEFAULT`.
+*   **Vantagem Técnica**: Reduz os pesos de 32-bit (float) para 8-bit (int), diminuindo o footprint de armazenamento sem exigir um dataset representativo para calibração de ativações.
+*   **Validação Crucial**: O script de otimização não apenas gera o arquivo, mas instanciao o `tf.lite.Interpreter` para garantir que a saída `(1, 10)` seja numericamente estável e precisa.
 
-A otimização foi realizada via **Dynamic Range Quantization (DRQ)** através do `TFLiteConverter`. Esta técnica quantiza os pesos do modelo para 8 bits durante o armazenamento, enquanto as ativações permanecem em ponto flutuante durante a execução, sendo convertidas dinamicamente. 
+---
 
-Essa abordagem foi escolhida por oferecer uma redução significativa de tamanho (aprox. 4x) sem a necessidade de um conjunto de dados de calibração complexo, mantendo a compatibilidade com diversos interpretadores de borda.
+## 📈 Análise Comparativa de Recursos
 
-## 4. Resultados obtidos
+```text
+Tamanho em Disco (KB)
+[####################] 494.6 KB (Original .h5)
+[#####               ] 124.5 KB (Otimizado .tflite)
+                       ^-- Redução de 370.1 KB!
+```
 
-Os resultados validam a eficácia da arquitetura e do processo de compressão:
+**Logs de Treinamento (Acurácia por Época):**
+*   **E01**: 86.8%
+*   **E02**: 94.8%
+*   **E03**: 95.9%
+*   **E04**: 96.7% (Final de Treino)
+*   **Teste**: **98.56%** (Generalização superior)
 
-| Indicador | Resultado |
-| :--- | :--- |
-| **Parâmetros Treináveis** | 119.530 |
-| **Acurácia Keras (Teste)** | 98,56% |
-| **Acurácia TFLite (Teste)** | 98,56% |
-| **Delta de Acurácia** | 0.00 pp |
-| **Tamanho model.h5** | 494,6 KB |
-| **Tamanho model.tflite** | 124,5 KB |
-| **Redução de Tamanho** | **74,8%** |
+---
 
-## 5. Comentários adicionais
-
-A pipeline demonstrou que a transição de um modelo de quase 500 KB para um de apenas 124 KB foi realizada com **perda zero de acurácia** (mantendo 98,56%). Isso confirma que o modelo original não estava excessivamente comprimido, permitindo que a quantização removesse redundâncias de precisão nos pesos sem afetar a inteligência da rede.
-
-O uso de `include_optimizer=False` no salvamento do arquivo `.h5` também contribuiu para um modelo inicial mais leve, focado estritamente na tarefa de inferência.
+## 🚀 Conclusão de Engenharia
+O modelo está pronto para produção em sistemas embarcados. A economia de **74,8%** no espaço em disco permite que o binário seja integrado em aplicações mobile ou microcontroladores com folga de recursos, enquanto a manutenção da acurácia em **98,56%** garante a confiabilidade do sistema de visão computacional.
