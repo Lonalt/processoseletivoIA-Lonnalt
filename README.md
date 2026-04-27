@@ -1,7 +1,3 @@
-Aqui está o seu relatório formatado e personalizado com os dados reais extraídos da execução dos seus scripts.
-
----
-
 # Relatório do Candidato
 
 **Nome completo:** Luann Alves Pereira De Lima  
